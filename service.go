@@ -22,23 +22,17 @@ func getYoutubeData(service *youtube.Service, part string, forUsername string, c
 		response.Items[0].Snippet.Title,
 		response.Items[0].ContentDetails.RelatedPlaylists.Uploads,
 		response.Items[0].Statistics.ViewCount))
-	//printVideosListResults(response)
+
 	return getPlaylistvidiews(service, "snippet,contentDetails", response.Items[0].ContentDetails.RelatedPlaylists.Uploads, ctx)
 
 }
 
 func getPlaylistvidiews(service *youtube.Service, part string, playlistid string, ctx context.Context) []Youtubeitem {
-	// vidlist := struct {
-	//   id:string
-	//   link:string,
-	//   title:string
-	// }
 	call := service.PlaylistItems.List(part)
 	call = call.PlaylistId(playlistid)
 	call = call.MaxResults(49)
 	response, err := call.Do()
 	handleError(ctx, err, "")
-	//printVideosListResults(service, response)
 	result := make([]Youtubeitem, 0)
 	for nexttoekn := response.NextPageToken; response.NextPageToken != ""; {
 		response, err = call.PageToken(nexttoekn).Do()
@@ -59,27 +53,6 @@ func getPlaylistvidiews(service *youtube.Service, part string, playlistid string
 			}
 
 		}
-
-		// printVideosListResults(service, response)
 	}
 	return result
 }
-
-// func printVideosListResults(service *youtube.Service, response *youtube.PlaylistItemListResponse) {
-// 	//fmt.Println(response.Items)
-// 	idlist := ""
-// 	for _, item := range response.Items {
-// 		//fmt.Println(item.Id, ": ", item.Snippet.Title,item.Snippet.ResourceId)
-// 		idlist = idlist + item.Snippet.ResourceId.VideoId + ","
-// 	}
-
-// 	call := service.Videos.List("snippet,contentDetails")
-// 	call = call.Id(idlist).MaxResults(49)
-// 	vidlist, err := call.Do()
-// 	handleError(err, "")
-// 	for _, vid := range vidlist.Items {
-// 		vid = vid
-
-// 		// fmt.Println(vid.Id, ": ", vid.Snippet.Title, "tag-", vid.Snippet.Tags)
-// 	}
-// }
